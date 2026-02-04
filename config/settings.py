@@ -8,7 +8,7 @@ from prompt_toolkit.contrib.telnet import TelnetServer
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-load_dotenv()
+load_dotenv(override=True)
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 
@@ -63,9 +63,6 @@ DATABASES = {
         "PASSWORD": os.getenv("DATABASE_PASSWORD"),
         "HOST": os.getenv("DATABASE_HOST"),
         "PORT": os.getenv("DATABASE_PORT", default="5432"),
-        # "OPTIONS": {
-        #     "options": "-c search_path=django_schema"
-        # }
     }
 }
 
