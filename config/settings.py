@@ -1,9 +1,9 @@
-from pathlib import Path
 import os
+from pathlib import Path
 
 import django_schema
+from django.conf.global_settings import MEDIA_ROOT, MEDIA_URL, STATICFILES_DIRS
 from dotenv import load_dotenv
-from django.conf.global_settings import STATICFILES_DIRS, MEDIA_URL, MEDIA_ROOT
 from prompt_toolkit.contrib.telnet import TelnetServer
 
 BASE_DIR = Path(__file__).resolve().parent.parent
