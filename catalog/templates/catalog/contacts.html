@@ -3,15 +3,16 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Skystore</title>
+    <title>ES</title>
     <link rel="stylesheet" type="text/css" href="/static/css/bootstrap.min.css">
 </head>
 <body>
 <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom box-shadow">
-    <h5 class="my-0 mr-md-auto font-weight-normal">Skystore</h5>
+    <h5 class="my-0 mr-md-auto font-weight-normal">ES</h5>
     <nav class="ms-5">
-        <a class="p-2 btn btn-outline-primary" href="/">Каталог</a>
-        <a class="p-2 btn btn-outline-primary" href="/contacts/">Контакты</a>
+        <a class="p-2 btn btn-outline-primary" href="/catalog">Каталог</a>
+        <a class="p-2 btn btn-outline-primary" href="/blog">Блог</a>
+        <a class="p-2 btn btn-outline-primary" href="/catalog/contacts/">Контакты</a>
     </nav>
 </div>
 
@@ -27,15 +28,23 @@
                     <table class="table table-striped">
                         <tr>
                             <td class="w-25">Страна</td>
-                            <td>USA</td>
-                        </tr>
-                        <tr>
-                            <td class="w-25">ИНН</td>
-                            <td>91-1144442</td>
+                            <td>{{ contact.country }}</td>
                         </tr>
                         <tr>
                             <td class="w-25">Адрес</td>
-                            <td>Redmond,WA,98052-6399</td>
+                            <td>{{ contact.address }}</td>
+                        </tr>
+                        <tr>
+                            <td class="w-25">ИНН</td>
+                            <td>{{ contact.inn }}</td>
+                        </tr>
+                        <tr>
+                            <td class="w-25">Email</td>
+                            <td>{{ contact.email }}</td>
+                        </tr>
+                        <tr>
+                            <td class="w-25">ИНН</td>
+                            <td>{{ contact.phone }}</td>
                         </tr>
                     </table>
                 </div>
@@ -71,8 +80,8 @@
     <footer class="pt-4 my-md-5 pt-md-5 border-top">
         <div class="row">
             <div class="col-12 col-md">
-                SkyStore
-                <small class="d-block mb-3 text-muted">&copy; 2023</small>
+                ES
+                <small class="d-block mb-3 text-muted">&copy; 2025</small>
             </div>
             <div class="col-6 col-md">
                 <h5>Категории</h5>
