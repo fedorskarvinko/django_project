@@ -6,7 +6,7 @@ from django.views.generic import CreateView, DetailView, ListView, TemplateView
 from catalog.models import Category, Product
 
 
-class CatalogListViews(ListView):
+class CatalogListView(ListView):
     model = Product
     queryset = Product.objects.order_by("-created_at")[:8]
 
