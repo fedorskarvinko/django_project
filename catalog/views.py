@@ -1,9 +1,16 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
-from django.views.generic import (CreateView, DeleteView, DetailView, ListView,
-                                  TemplateView, UpdateView)
+from django.views.generic import (
+    CreateView,
+    DeleteView,
+    DetailView,
+    ListView,
+    TemplateView,
+    UpdateView,
+)
 
 from catalog.forms import ProductForm
 from catalog.models import Product
@@ -55,12 +62,29 @@ class ProductCreateView(LoginRequiredMixin, CreateView):
             "catalog:product_detail", kwargs={"product_id": self.object.id}
         )
 
+    def form_valid(self, form):
+        form.instance.owner = self.request.user
+        return super().form_valid(form)
 
-class ProductUpdateView(LoginRequiredMixin, UpdateView):
+
+class ProductUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Product
     form_class = ProductForm
     template_name = "catalog/product_form.html"
     pk_url_kwarg = "pk"
+
+    def test_func(self):
+        product = self.get_object()
+        return product.owner == self.request.user
+
+    def form_valid(self, form):
+        if "is_published" in form.changed_data and not form.instance.is_published:
+            if not self.request.user.has_perm("catalog.can_unpublish_product"):
+                messages.error(self.request, "У вас нет прав на отмену публикации")
+                return redirect("catalog:product_detail", pk=self.object.pk)
+
+        messages.success(self.request, "Продукт успешно обновлен!")
+        return super().form_valid(form)
 
     def get_success_url(self):
         return reverse_lazy(
@@ -68,8 +92,13 @@ class ProductUpdateView(LoginRequiredMixin, UpdateView):
         )
 
 
-class ProductDeleteView(LoginRequiredMixin, DeleteView):
+class ProductDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Product
     template_name = "catalog/product_confirm_delete.html"
     pk_url_kwarg = "product_id"
     success_url = reverse_lazy("catalog:product_list")
+
+    def test_func(self):
+        product = self.get_object()
+        user = self.request.user
+        return product.owner == user or user.has_perm("catalog.delete_product")
