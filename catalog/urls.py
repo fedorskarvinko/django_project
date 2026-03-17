@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path
+from django.views.decorators.cache import cache_page
+from executing import cache
 
 from catalog.apps import CatalogConfig
 from catalog.views import (
@@ -10,6 +12,7 @@ from catalog.views import (
     ProductDetailView,
     ProductListView,
     ProductUpdateView,
+    CategoryProductListView,
 )
 
 app_name = CatalogConfig.name
@@ -26,6 +29,11 @@ urlpatterns = [
     ),
     path(
         "product_delete/<int:pk>/", ProductDeleteView.as_view(), name="product_delete"
+    ),
+    path(
+        "category_products/",
+        CategoryProductListView.as_view(),
+        name="category_products",
     ),
 ]
 

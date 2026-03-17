@@ -1,8 +1,11 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.core.cache import cache
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 from django.views.generic import (
     CreateView,
     DeleteView,
@@ -13,7 +16,7 @@ from django.views.generic import (
 )
 
 from catalog.forms import ProductForm
-from catalog.models import Product
+from catalog.models import Product, Category
 
 
 class ContactsView(TemplateView):
@@ -37,9 +40,20 @@ class ContactsView(TemplateView):
 class ProductListView(ListView):
     model = Product
     template_name = "catalog/product_list.html"
-    queryset = Product.objects.order_by("-created_at")[:8]
+
+    # queryset = Product.objects.order_by("-created_at")[:8]
+
+    def get_queryset(self):
+        queryset = cache.get("product_queryset")
+        if not queryset:
+            queryset = super().get_queryset()
+            cache.set(
+                "product_queryset", queryset, 60 * 15
+            )  # Кешируем данные на 15 минут
+        return queryset
 
 
+@method_decorator(cache_page(60 * 15), name="dispatch")
 class ProductDetailView(LoginRequiredMixin, DetailView):
     model = Product
     template_name = "catalog/product_detail.html"
@@ -59,7 +73,7 @@ class ProductCreateView(LoginRequiredMixin, CreateView):
 
     def get_success_url(self):
         return reverse_lazy(
-            "catalog:product_detail", kwargs={"product_id": self.object.id}
+            "catalog:product_detail", kwargs={"pk": self.object.id}
         )
 
     def form_valid(self, form):
@@ -88,17 +102,36 @@ class ProductUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
     def get_success_url(self):
         return reverse_lazy(
-            "catalog:product_detail", kwargs={"product_id": self.object.id}
+            "catalog:product_detail", kwargs={"pk": self.object.id}
         )
 
 
 class ProductDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Product
     template_name = "catalog/product_confirm_delete.html"
-    pk_url_kwarg = "product_id"
+    pk_url_kwarg = "pk"
     success_url = reverse_lazy("catalog:product_list")
 
     def test_func(self):
         product = self.get_object()
         user = self.request.user
         return product.owner == user or user.has_perm("catalog.delete_product")
+
+
+class CategoryProductListView(ListView):
+    model = Category
+    template_name = "catalog/category_products.html"
+    context_object_name = "products"
+    paginate_by = 12
+
+    def get_queryset(self):
+        from django.shortcuts import get_object_or_404
+        from .services import get_products_by_category
+
+        self.category = get_object_or_404(Category, id=self.kwargs["category_id"])
+        return get_products_by_category(self.category.id)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["category"] = self.category
+        return context
