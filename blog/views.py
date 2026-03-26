@@ -1,20 +1,15 @@
 from django.http.response import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
-from django.views.generic import (
-    CreateView,
-    DeleteView,
-    DetailView,
-    ListView,
-    TemplateView,
-    UpdateView,
-)
+from django.views.generic import (CreateView, DeleteView, DetailView, ListView,
+                                  TemplateView, UpdateView)
 
 from blog.models import Blog
 
 
-class BlogListViews(ListView):
+class BlogListView(ListView):
     model = Blog
+    template_name = "blog/blog_list.html"
 
     def get_queryset(self):
         filtered = Blog.objects.filter(is_published=True)
@@ -29,7 +24,7 @@ class BlogCreateView(CreateView):
     success_url = reverse_lazy("blog:blog_list")
 
 
-class BlogDetailViews(DetailView):
+class BlogDetailView(DetailView):
     model = Blog
 
     def get_object(self, queryset=None):
@@ -39,7 +34,7 @@ class BlogDetailViews(DetailView):
         return obj
 
 
-class BlogUpdateViews(UpdateView):
+class BlogUpdateView(UpdateView):
     model = Blog
     fields = ["title", "content", "preview", "is_published"]
     template_name = "blog/blog_create.html"
@@ -48,6 +43,6 @@ class BlogUpdateViews(UpdateView):
         return reverse_lazy("blog:blog_detail", kwargs={"pk": self.object.pk})
 
 
-class BlogDeleteViews(DeleteView):
+class BlogDeleteView(DeleteView):
     model = Blog
     success_url = reverse_lazy("blog:blog_list")
