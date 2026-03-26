@@ -19,7 +19,14 @@ ban_words = [
 class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
-        fields = ["name", "description", "category", "purchase_price", "image"]
+        fields = [
+            "name",
+            "description",
+            "category",
+            "purchase_price",
+            "image",
+            "is_published",
+        ]
 
     def __init__(self, *args, **kwargs):
         super(ProductForm, self).__init__(*args, **kwargs)

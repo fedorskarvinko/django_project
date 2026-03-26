@@ -20,9 +20,9 @@ class UserCreateView(CreateView):
     def form_valid(self, form):
         user = form.save()
         send_mail(
-            'Добро пожаловать в магазин!',
-            f'Спасибо за регистрацию, {user.email}!',
-            'fedorskarvinko@yandex.ru',
+            "Добро пожаловать в магазин!",
+            f"Спасибо за регистрацию, {user.email}!",
+            "fedorskarvinko@yandex.ru",
             [user.email],
             fail_silently=False,
         )

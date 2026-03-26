@@ -6,16 +6,24 @@ class User(AbstractUser):
     username = None
     email = models.EmailField(unique=True, verbose_name="Email")
 
-    phone = models.CharField(max_length=35, verbose_name="Телефон", null=True, help_text="Введите номер телефона")
-    avatar = models.ImageField(
-        upload_to="users/avatars/", verbose_name="Аватар", null=True, help_text="Загрузите свой автар"
+    phone = models.CharField(
+        max_length=35,
+        verbose_name="Телефон",
+        null=True,
+        help_text="Введите номер телефона",
     )
-    country = models.CharField(max_length=30, verbose_name="Страна", null=True, help_text="Укажите страну")
-
+    avatar = models.ImageField(
+        upload_to="users/avatars/",
+        verbose_name="Аватар",
+        null=True,
+        help_text="Загрузите свой автар",
+    )
+    country = models.CharField(
+        max_length=30, verbose_name="Страна", null=True, help_text="Укажите страну"
+    )
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
-
 
     class Meta:
         verbose_name = "Пользователь"
